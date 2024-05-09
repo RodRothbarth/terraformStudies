@@ -40,6 +40,7 @@ resource "azurerm_linux_virtual_machine" "terraform_vm" {
   network_interface_ids = [
     azurerm_network_interface.nte_interface.id,
   ]
+  custom_data = base64encode(file("./init-scripts/docker.sh"))
 
   admin_ssh_key {
     username   = "adminuser"
@@ -56,34 +57,6 @@ resource "azurerm_linux_virtual_machine" "terraform_vm" {
     offer     = "0001-com-ubuntu-server-jammy"
     sku       = "22_04-lts"
     version   = "latest"
-  }
-
-  provisioner "local-exec" {
-    command = "echo ${self.public_ip_address} >> public_ip.txt"
-  }
-
-  connection {
-    type        = "ssh"
-    user        = "adminuser"
-    private_key = file("../../azure-terraform")
-    host        = self.public_ip_address
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "echo subnet_id: ${data.terraform_remote_state.vnet-remote-data.outputs.subnetId} >> /tmp/networkinfo.txt",
-      "echo SG_id: ${data.terraform_remote_state.vnet-remote-data.outputs.SGid} >> /tmp/networkinfo.txt"
-    ]
-  }
-
-  provisioner "file" {
-    source      = "./docs/"
-    destination = "/tmp"
-  }
-
-  provisioner "file" {
-    content     = "Vm size: ${self.size}"
-    destination = "/tmp/vmsize.txt"
   }
 
   tags = local.common_tags

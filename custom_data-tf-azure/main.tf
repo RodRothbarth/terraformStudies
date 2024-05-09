@@ -11,7 +11,7 @@ terraform {
     resource_group_name  = "rodrothbarth-remote-state"
     storage_account_name = "rodrothbarthstoraccount"
     container_name       = "rodrothbarth-remotestate"
-    key                  = "azure-vm-provisioners/terraform.tfstate"
+    key                  = "azure-vm-custom_data/terraform.tfstate"
   }
 }
 
